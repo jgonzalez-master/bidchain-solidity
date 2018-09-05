@@ -10,8 +10,8 @@ contract Factory{
 
     mapping(uint => address) private bidInfo;
 
-    function newCampaign(string _name, uint _duration, address _beneficiary, string _description) public returns (uint) {
-        Bid c = new Bid(_name, now + _duration, _beneficiary, _description);
+    function newBid(string _name, uint _duration, address _beneficiary, string _description, string _url) public returns (uint) {
+        Bid c = new Bid(_name, now + _duration, _beneficiary, _description, _url);
         bidInfo[currentId] = c;
         emit NewBid(c);
         currentId++;
@@ -19,6 +19,6 @@ contract Factory{
     }
 
     function getBidInfo(uint _id) public view returns (address) {
-        return bidInfo[_id];
+        return bidInfo[_id];        
     }
 }

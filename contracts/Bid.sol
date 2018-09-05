@@ -15,6 +15,7 @@ contract Bid {
     uint maxBid;
     bidState state;
     string description;
+    string url;
 
     event AddBid(address _bidder, uint _amount);
 
@@ -30,31 +31,39 @@ contract Bid {
         _;
     }
 
-    constructor(string _name, uint _deadline, address _beneficiary, string _description) public {
+    constructor(string _name, uint _deadline, address _beneficiary, string _description, string _url) public {
         name = _name;
         deadline = now + _deadline;
         beneficiary = _beneficiary;
         state = bidState.Bidding;
         description = _description;
+        url = _url;
     }
 
-    function currentWinner() public view returns (address, uint){
-        return (maxBidder, maxBid);
-    }
-
-    function totalBidders() public view returns (uint) {
-        return totalBiddersArr.length;
+    //Returns name, deadline, beneficiary, description, url, maxBid, totalBidders
+    function bidDetails() public view returns (string, uint, address, string, string, uint, uint) {
+        return (
+            name,
+            deadline,
+            beneficiary,
+            description,
+            url,
+            maxBid,
+            totalBiddersArr.length
+        );
     }
 
     function addBid() public payable {
-        require(msg.value > maxBid, "Bid needs to be higher than the current.");
-        require(msg.sender != beneficiary, "Beneficiary cannot be a bidder.");
+        uint bid = bidders[tx.origin].add(msg.value);
 
-        maxBid = msg.value;
-        maxBidder = msg.sender;
+        require(bid > maxBid, "Total bid needs to be higher than the current.");
+        require(tx.origin != beneficiary, "Beneficiary cannot be a bidder.");
+
+        maxBid = bid;
+        maxBidder = tx.origin;
 
         if(bidders[maxBidder] == 0) totalBiddersArr.push(maxBidder);
-        bidders[maxBidder] = bidders[maxBidder].add(maxBid);
+        bidders[maxBidder] = maxBid;
         emit AddBid(maxBidder, maxBid);
     }
 
