@@ -1,0 +1,11 @@
+{
+  "name": "bidchain",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "solc": "^0.4.24"
+  },
+  "scripts": {
+    "build:contracts": "node node_modules/solc/solcjs --abi contracts/*.sol -o contracts"
+  }
+}
