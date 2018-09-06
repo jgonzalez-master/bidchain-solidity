@@ -5,7 +5,6 @@ import "./SafeMath.sol";
 contract Bid {
     using SafeMath for uint256;
     
-    uint id;
     address beneficiary;
     uint deadline;
     string name;
@@ -33,11 +32,12 @@ contract Bid {
 
     constructor(string _name, uint _deadline, address _beneficiary, string _description, string _url) public {
         name = _name;
-        deadline = now + _deadline;
+        deadline = _deadline;
         beneficiary = _beneficiary;
-        state = bidState.Bidding;
         description = _description;
         url = _url;
+
+        state = bidState.Bidding;
     }
 
     //Returns name, deadline, beneficiary, description, url, maxBid, totalBidders
@@ -53,14 +53,14 @@ contract Bid {
         );
     }
 
-    function addBid() public payable {
-        uint bid = bidders[tx.origin].add(msg.value);
+    function addBid(address _bidder) public payable {
+        uint bid = bidders[_bidder].add(msg.value);
 
         require(bid > maxBid, "Total bid needs to be higher than the current.");
-        require(tx.origin != beneficiary, "Beneficiary cannot be a bidder.");
+        require(_bidder != beneficiary, "Beneficiary cannot be a bidder.");
 
         maxBid = bid;
-        maxBidder = tx.origin;
+        maxBidder = _bidder;
 
         if(bidders[maxBidder] == 0) totalBiddersArr.push(maxBidder);
         bidders[maxBidder] = maxBid;
@@ -75,6 +75,7 @@ contract Bid {
 
     function refund(address _bidderAddr) public deadlineReached hasBalance {
         require(_bidderAddr != maxBidder, "Maximum bidder cannot be refunded.");
+        require(bidders[_bidderAddr] > 0, "Bidder has been already refunded.");
 
         uint amountToSend = bidders[_bidderAddr];
         bidders[_bidderAddr] = 0;

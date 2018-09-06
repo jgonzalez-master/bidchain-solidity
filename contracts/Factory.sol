@@ -11,9 +11,9 @@ contract Factory{
     mapping(uint => address) private bidInfo;
 
     function newBid(string _name, uint _duration, address _beneficiary, string _description, string _url) public returns (uint) {
-        Bid c = new Bid(_name, now + _duration, _beneficiary, _description, _url);
-        bidInfo[currentId] = c;
-        emit NewBid(c);
+        Bid bid = new Bid(_name, now + _duration, _beneficiary, _description, _url);
+        bidInfo[currentId] = bid;
+        emit NewBid(bid);
         currentId++;
         return currentId-1;
     }

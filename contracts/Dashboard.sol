@@ -26,23 +26,27 @@ contract Dashboard {
     }
 
     function viewCurrentBid(uint _id) public validateAddress(_id) view returns (string, uint, address, string, string, uint, uint) {
-        Bid c = Bid(getBidAddress(_id));
-        return c.bidDetails();
+        Bid bid = Bid(getBidAddress(_id));
+        return bid.bidDetails();
     }
 
     function makeBid(uint _id)  public payable validateAddress(_id) {
         require(msg.value > 0, "New bid needs to be greater than zero.");
-        Bid c = Bid(getBidAddress(_id));
-        c.addBid.value(msg.value);
+        Bid bid = Bid(getBidAddress(_id));
+        bid.addBid.value(msg.value)(msg.sender);
     }
 
     function getRefund(uint _id) public validateAddress(_id) {
-        Bid c = Bid(getBidAddress(_id));
-        c.refund(msg.sender);
+        Bid bid = Bid(getBidAddress(_id));
+        bid.refund(msg.sender);
     }
 
     function pushPayout(uint _id) public validateAddress(_id) {
-        Bid c = Bid(getBidAddress(_id));
-        c.payout();
+        Bid bid = Bid(getBidAddress(_id));
+        bid.payout();
+    }
+
+    function contratNow() public view returns(uint){
+        return now;
     }
 }
