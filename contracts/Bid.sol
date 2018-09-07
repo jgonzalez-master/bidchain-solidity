@@ -40,11 +40,11 @@ contract Bid {
         state = bidState.Bidding;
     }
 
-    //Returns name, deadline, beneficiary, description, url, maxBid, totalBidders
+    //Returns name, deadline (remaining time), beneficiary, description, url, maxBid, totalBidders
     function bidDetails() public view returns (string, uint, address, string, string, uint, uint) {
         return (
             name,
-            deadline,
+            deadline > now ? deadline - now : 0,
             beneficiary,
             description,
             url,
@@ -71,6 +71,7 @@ contract Bid {
         
         beneficiary.transfer(maxBid);
         state = bidState.Payed;
+        disable();
     }
 
     function refund(address _bidderAddr) public deadlineReached hasBalance {
@@ -80,10 +81,11 @@ contract Bid {
         uint amountToSend = bidders[_bidderAddr];
         bidders[_bidderAddr] = 0;
         _bidderAddr.transfer(amountToSend);
+        disable();
     }
 
     function disable() public deadlineReached {
-        require(state == bidState.Payed, "Bid needs to be payed to the owner before destruct.");
-        selfdestruct(beneficiary);
+        if(address(this).balance > 0 && state == bidState.Payed)
+            selfdestruct(beneficiary);
     }
 }
